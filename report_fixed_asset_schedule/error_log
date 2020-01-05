@@ -1,0 +1,4 @@
+[01-Dec-2009 17:45:54] PHP Warning:  mysql_fetch_assoc(): supplied argument is not a valid MySQL result resource in /home/gsmairc/public_html/assets/lib/class.db.php on line 101
+[01-Dec-2009 17:45:54] PHP Warning:  mysql_fetch_assoc(): supplied argument is not a valid MySQL result resource in /home/gsmairc/public_html/assets/lib/class.db.php on line 101
+[01-Dec-2009 17:45:54] PHP Warning:  mysql_fetch_assoc(): supplied argument is not a valid MySQL result resource in /home/gsmairc/public_html/assets/lib/class.db.php on line 101
+[01-Dec-2009 17:45:54] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/gsmairc/public_html/assets/lib/class.db.php:136) in /home/gsmairc/public_html/assets/fpdf/fpdf.php on line 1022

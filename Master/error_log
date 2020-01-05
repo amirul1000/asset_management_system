@@ -1,0 +1,17 @@
+[18-Nov-2009 01:53:05] PHP Warning:  mysql_num_fields(): supplied argument is not a valid MySQL result resource in /home/gsmairc/public_html/assets/common/lib.php on line 23
+[18-Nov-2009 01:53:05] PHP Warning:  mysql_fetch_assoc(): supplied argument is not a valid MySQL result resource in /home/gsmairc/public_html/assets/lib/class.db.php on line 101
+[18-Nov-2009 01:53:05] PHP Warning:  mysql_fetch_assoc(): supplied argument is not a valid MySQL result resource in /home/gsmairc/public_html/assets/lib/class.db.php on line 101
+[18-Nov-2009 01:53:16] PHP Warning:  mysql_num_fields(): supplied argument is not a valid MySQL result resource in /home/gsmairc/public_html/assets/common/lib.php on line 23
+[18-Nov-2009 01:53:16] PHP Warning:  mysql_fetch_assoc(): supplied argument is not a valid MySQL result resource in /home/gsmairc/public_html/assets/lib/class.db.php on line 101
+[18-Nov-2009 01:53:16] PHP Warning:  mysql_fetch_assoc(): supplied argument is not a valid MySQL result resource in /home/gsmairc/public_html/assets/lib/class.db.php on line 101
+[18-Nov-2009 01:53:21] PHP Warning:  mysql_num_fields(): supplied argument is not a valid MySQL result resource in /home/gsmairc/public_html/assets/common/lib.php on line 23
+[18-Nov-2009 01:53:21] PHP Warning:  mysql_fetch_assoc(): supplied argument is not a valid MySQL result resource in /home/gsmairc/public_html/assets/lib/class.db.php on line 101
+[18-Nov-2009 01:53:21] PHP Warning:  mysql_fetch_assoc(): supplied argument is not a valid MySQL result resource in /home/gsmairc/public_html/assets/lib/class.db.php on line 101
+[18-Nov-2009 01:59:22] PHP Warning:  mysql_num_fields(): supplied argument is not a valid MySQL result resource in /home/gsmairc/public_html/assets/common/lib.php on line 23
+[18-Nov-2009 01:59:22] PHP Warning:  mysql_fetch_assoc(): supplied argument is not a valid MySQL result resource in /home/gsmairc/public_html/assets/lib/class.db.php on line 101
+[18-Nov-2009 01:59:22] PHP Warning:  mysql_fetch_assoc(): supplied argument is not a valid MySQL result resource in /home/gsmairc/public_html/assets/lib/class.db.php on line 101
+[19-Nov-2009 12:40:15] PHP Warning:  mysql_fetch_assoc(): supplied argument is not a valid MySQL result resource in /home/gsmairc/public_html/assets/lib/class.db.php on line 101
+[19-Nov-2009 12:40:15] PHP Warning:  mysql_fetch_assoc(): supplied argument is not a valid MySQL result resource in /home/gsmairc/public_html/assets/lib/class.db.php on line 101
+[30-Nov-2009 20:55:34] PHP Warning:  include(../template/left_menu.php) [<a href='function.include'>function.include</a>]: failed to open stream: No such file or directory in /home/gsmairc/public_html/assets/template/header.php on line 37
+[30-Nov-2009 20:55:34] PHP Warning:  include(../template/left_menu.php) [<a href='function.include'>function.include</a>]: failed to open stream: No such file or directory in /home/gsmairc/public_html/assets/template/header.php on line 37
+[30-Nov-2009 20:55:34] PHP Warning:  include() [<a href='function.include'>function.include</a>]: Failed opening '../template/left_menu.php' for inclusion (include_path='.:/usr/lib/php:/usr/local/lib/php') in /home/gsmairc/public_html/assets/template/header.php on line 37

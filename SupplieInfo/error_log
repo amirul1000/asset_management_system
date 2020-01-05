@@ -1,0 +1,6 @@
+[18-Nov-2009 01:53:48] PHP Warning:  mysql_num_fields(): supplied argument is not a valid MySQL result resource in /home/gsmairc/public_html/assets/common/lib.php on line 23
+[18-Nov-2009 01:53:48] PHP Warning:  mysql_fetch_assoc(): supplied argument is not a valid MySQL result resource in /home/gsmairc/public_html/assets/lib/class.db.php on line 101
+[18-Nov-2009 01:53:48] PHP Warning:  mysql_fetch_assoc(): supplied argument is not a valid MySQL result resource in /home/gsmairc/public_html/assets/lib/class.db.php on line 101
+[18-Nov-2009 02:48:23] PHP Warning:  mysql_num_fields(): supplied argument is not a valid MySQL result resource in /home/gsmairc/public_html/assets/common/lib.php on line 23
+[18-Nov-2009 02:48:23] PHP Warning:  mysql_fetch_assoc(): supplied argument is not a valid MySQL result resource in /home/gsmairc/public_html/assets/lib/class.db.php on line 101
+[18-Nov-2009 02:48:23] PHP Warning:  mysql_fetch_assoc(): supplied argument is not a valid MySQL result resource in /home/gsmairc/public_html/assets/lib/class.db.php on line 101

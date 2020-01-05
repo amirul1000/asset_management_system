@@ -1,0 +1,352 @@
+<?php 
+session_start();
+set_time_limit(0);
+
+include("../lib/class.db.php");
+include("../common/config.php");
+include("../common/lib.php");
+include('../fpdf/fpdf.php');
+include('report_fixed_asset_schedule_dispose_summary.lib.php');
+     /*
+        Check  session , if not exists log out
+     */
+if(empty($_SESSION['userid'])&&empty($_SESSION['password']))
+{    
+    session_destroy();
+    Header("Location:../login/login.php");
+}
+
+    
+
+$cmd = $_REQUEST['cmd'];
+
+switch($cmd)
+{
+    case "make_report_fixed_asset_schedule_dispose_summary":
+	         require_once "../php_writeexcel/class.writeexcel_workbook.inc.php";
+			require_once "../php_writeexcel/class.writeexcel_worksheet.inc.php";
+
+			$fname = tempnam("/tmp", "convert_orderlist_to_xcell.xls");
+			$workbook = &new writeexcel_workbook($fname);
+			$worksheet = &$workbook->addworksheet();
+			# Set the column width for columns 1, 2, 3 and 4
+		//	$worksheet->set_column(0, 100, 25);
+
+
+           # Create a format for the column headings
+            $header =& $workbook->addformat();
+            $header->set_bold();
+            $header->set_font("Courier New");
+            #$header->set_align('center');
+            $header->set_align('vcenter');
+
+            # Create a "vertical justification" format
+            $format1 =& $workbook->addformat();
+            $format1->set_align('center');
+
+            # Create a "text wrap" format
+            $format2 =& $workbook->addformat();
+            $format2->set_text_wrap();
+
+			$row = 0;
+			$col = 2;
+
+	      /****************************************************************/
+			     $worksheet->write($row, $col,$_SESSION["ComName"]);
+				 $row = $row +1;
+				 $worksheet->write($row, $col,$_SESSION["Address1"]);
+				 $row = $row +1;
+				 $worksheet->write($row, $col,$_SESSION["Address2"]);
+				 $row = $row +1;
+				 $worksheet->write($row, $col,"FIXED ASSETS STATEMENT", $header);
+				 $row = $row +1;
+				 $info['table']    = "currency";
+				$info['fields']   = array("*");
+				$info['where']    =  "id='".$_REQUEST['currency']."'";
+				$res  =  $db->select($info);
+				
+				$Id        = $res[0]['id'];
+				$from_country = $res[0]['from_country'];
+				$from_country_currency = $res[0]['from_country_currency'];
+				$to_country = $res[0]['to_country'];
+				$to_country_currency = $res[0]['to_country_currency'];
+				
+				$ratio_currency = $to_country_currency /$from_country_currency;
+				
+				if($res[0]['alias_name']=="BDT")
+				{
+				$currency = "Taka";
+				} 
+				else
+				{
+				$currency ="Dollar";
+				}
+			   $worksheet->write($row, $col,"( In ".$to_country." ".$currency.")");
+				  $row = $row +1;
+				 
+				 $worksheet->write($row, $col,"For the period ending-date: ".date("F j, Y",strtotime($_SESSION['clDate'])));
+				 $row = $row +1;
+				 $worksheet->write(0, 6,"Print date:".date("F j, Y",strtotime($_REQUEST["Assetat"])));
+				 $row = $row +2;
+				 $col =0;
+			/****************************************************************/
+	
+		
+		
+
+		if($_REQUEST['option']=='SubGroup')
+		{  
+			$where = " AND master.SubGroup='".$_REQUEST['SubGroup']."'";
+			$orderby = "master.SubGroup";
+			$selected = "SubGroup";
+		}
+		elseif($_REQUEST['option']=='DefGroup')
+		{ 
+			$where = " AND master.DefGroup='".$_REQUEST['DefGroup']."'";
+			$orderby = "master.DefGroup";
+			$selected = "DefGroup";
+		}
+		
+		
+			 $headerflag=true;
+		 
+        $g_op_balance=0;
+        $g_purchase=0;
+        $g_other=0;
+        $g_total_cost=0;
+        $g_book_value=0;
+        $g_proceeds_dispose=0;
+		$g_depreciation = 0;
+        $g_closing_balance=0;
+		 
+
+       
+        $info["table"] = "master left outer join company on(master.ComID=company.id) ";
+		$info["fields"] = array("master.*","company.opDate","company.clDate");
+		$info["where"]  = "1  Group BY DefGroup  ORDER BY $orderby ASC";
+		//GROUP BY master.DefGroup
+		$res = $db->select($info);
+		
+
+		$topName= true;
+        $s_op_balance=0;
+        $s_purchase=0;
+        $s_other=0;
+        $s_total_cost=0;
+        $s_book_value=0;
+        $s_proceeds_dispose=0;
+		$s_depreciation = 0;
+        $s_closing_balance=0;
+
+		for($i=0;$i<count($res);$i++)
+		{
+		
+		   $subflag = true;
+		   $totalflag = true;
+		
+				   if($headerflag==true)
+				{
+				$headerflag=false;
+				
+				
+				$worksheet->write($row, $col,"CATEGORY", $format2);
+				
+				
+				$worksheet->write($row, $col+1,"Opening Balance A", $format2);
+				$worksheet->write($row, $col+2,"Purchase B", $format2);
+				$worksheet->write($row-1, $col+2,"ACQUISITIONS", $header);
+				$worksheet->write($row, $col+3,"Other Source C", $format2);
+				$worksheet->write($row, $col+4,"Total D=A+B+C", $format2);
+				$worksheet->write($row, $col+5,"Book Value E", $format2);
+				$worksheet->write($row-1, $col+5,"DISPOSITION", $header);
+				$worksheet->write($row, $col+6,"Proceeds of Disposal F", $format2);
+				$worksheet->write($row, $col+7,"Depreciation opening bal.10% G", $format2);
+				$worksheet->write($row, $col+8,"Closing Balance D-(E+G)", $format2);
+				//Header of Table
+		
+				}
+			
+				 $row = $row +1;
+				 $col =0;
+				$worksheet->write($row, $col,$res[$i][$selected]);//"ACode"
+				//Header of Table
+				/**********************Opening Balance******************************/
+				$info["table"] = "master left outer join company on(master.ComID=company.id) ";
+				$info["fields"] = array("sum(OpAssets) as OpAssets");
+				$info["where"]  = "1 AND master.DefGroup='".$res[$i]["DefGroup"]."'";// AND master.SerDate between '".$_SESSION['opDate']."' AND '".$_SESSION['clDate']."'";
+				//GROUP BY master.DefGroup				
+				$resOpAssets = $db->select($info);
+                
+				$op_balance = $resOpAssets[0]["OpAssets"];
+				
+				/*
+			   
+			   unset($info);
+			   unset($data);
+			   $info["table"] = "disposeassets left outer join  master on(disposeassets.ACode=master.ACode)";
+			   $info["fields"] = array("sum(BookValue) as BookValue");
+			   $info["where"]  = "1  AND master.DefGroup='".$res[$i]["DefGroup"]."'  AND master.ComID='".$res[$i]["ComID"]."'   AND TDate<'".$_SESSION['opDate']."'";// AND details.TDate<'".$_REQUEST["Assetat"]."'";
+			
+			   $resbookvalue = $db->select($info);
+			  	   
+			   $op_balance =$op_balance-$resbookvalue[0]["BookValue"];
+                                       */
+				
+				$op_balance =$op_balance*$ratio_currency;
+	
+				
+				$worksheet->write($row, $col+1,number_format($op_balance, 2, '.', ','));
+	          /**********************End Of Opening Balance******************************/
+				
+			   unset($info);
+			   unset($data);
+			   $info["table"] = "details left outer join  master on(details.ACode=master.ACode)";
+			   $info["fields"] = array("sum(Debit) as Debit");
+			   $info["where"]  = "1  AND master.DefGroup='".$res[$i]["DefGroup"]."'  AND details.ComID='".$res[$i]["ComID"]."' AND Debit>0 AND TDate>='".$_SESSION['opDate']."' AND TDate<='".$_SESSION['clDate']."'";// AND details.TDate<'".$_REQUEST["Assetat"]."'";
+			   $resdebit = $db->select($info);
+			   $purchase=$resdebit[0]["Debit"];
+			   if(empty($purchase))
+			   {
+			   $purchase = 0;
+			   }
+			  
+			   //$cost=$res[$i]["PurCost"]+$res[$i]["InstCost"]+$res[$i]["CarryCost"]+$res[$i]["OtherCost"];
+			   $purchase = $purchase*$ratio_currency;
+	
+			   $worksheet->write($row, $col+2,number_format($purchase, 2, '.', ','));
+				   $other=$res[$i]["InstCost"]+$res[$i]["CarryCost"]+$res[$i]["OtherCost"];
+				  $other=$other*$ratio_currency;
+				
+				$worksheet->write($row, $col+3,number_format($other, 2, '.', ','),$format1);
+				$total_cost=  $op_balance  + $purchase +  $other;
+				
+				$worksheet->write($row, $col+4,number_format($total_cost, 2, '.', ','));
+			   unset($info);
+			   unset($data);
+			   $info["table"] = "disposeassets left outer join  master on(disposeassets.ACode=master.ACode)";
+			   $info["fields"] = array("sum(BookValue) as BookValue");
+			   $info["where"]  = "1  AND master.DefGroup='".$res[$i]["DefGroup"]."'    AND disposeassets.TDate<='".$_REQUEST["Assetat"]."' AND TDate>='".$_SESSION['opDate']."' AND TDate<='".$_SESSION['clDate']."'";// AND details.TDate<'".$_REQUEST["Assetat"]."'";
+			
+			   $resbookvalue = $db->select($info);			
+			
+				
+				$book_value =  $resbookvalue[0]["BookValue"];
+				$book_value=$book_value*$ratio_currency;
+				
+				$worksheet->write($row, $col+5,number_format($book_value, 2, '.', ','),$format1);
+				
+			  /* unset($info);
+			   unset($data);
+			   $info["table"] = "details left outer join  master on(details.ACode=master.ACode)";
+			   $info["fields"] = array("sum(Credit) as Credit");
+			   $info["where"]  = "1  AND master.DefGroup='".$res[$i]["DefGroup"]."' AND details.ComID='".$res[$i]["ComID"]."' AND Credit>0  AND details.TDate<='".$_REQUEST["Assetat"]."' AND TDate>='".$_SESSION['opDate']."' AND TDate<='".$_SESSION['clDate']."'";// AND details.TDate<'".$_REQUEST["Assetat"]."'";
+			
+			   $resdetails = $db->select($info);*/
+			    unset($info);
+			   unset($data);
+			   $info["table"] = "disposeassets left outer join  master on(disposeassets.ACode=master.ACode)";
+			   $info["fields"] = array("sum(NetProceeds ) as NetProceeds");
+			   $info["where"]  = "1  AND master.DefGroup='".$res[$i]["DefGroup"]."'    AND disposeassets.TDate<='".$_REQUEST["Assetat"]."' AND TDate>='".$_SESSION['opDate']."' AND TDate<='".$_SESSION['clDate']."'";// AND details.TDate<'".$_REQUEST["Assetat"]."'";
+			
+			   $resnetproceeds = $db->select($info);					
+				$proceeds_dispose=$resnetproceeds[0]["NetProceeds"];
+				if(empty($proceeds_dispose))
+				{
+				 $proceeds_dispose=0;
+				}
+				$proceeds_dispose =$proceeds_dispose*$ratio_currency;;
+				
+				$worksheet->write($row, $col+6,number_format($proceeds_dispose, 2, '.', ','));
+				
+				unset($info);
+				unset($data);
+			   $info["table"] = "details left outer join  master on(details.ACode=master.ACode)";
+			   $info["fields"] = array("sum(DepDebit) as DepDebit");
+			   $info["where"]  = "1   AND master.DefGroup='".$res[$i]["DefGroup"]."'   AND details.ComID='".$res[$i]["ComID"]."' AND TDate<='".$_REQUEST["Assetat"]."'  AND ( Dispose=0 OR ( Dispose=1 AND  TDate>='".$_SESSION['opDate']."' 
+AND TDate<='".$_SESSION['clDate']."'))";// AND TDate<='".$_SESSION['clDate']."'";// AND details.TDate<'".$_REQUEST["Assetat"]."'";
+			
+			   $resdetails1 = $db->select($info);
+				if(empty($resdetails1[0]["DepDebit"]))
+			   { 
+				$resdetails1[0]["DepDebit"]=0;
+			   }
+				
+				$depreciation = $resdetails1[0]["DepDebit"]*$ratio_currency;;
+				$worksheet->write($row, $col+7,number_format($depreciation, 2, '.', ','));
+				
+				$closing_balance =$total_cost-($book_value+$depreciation);
+				$worksheet->write($row, $col+8,number_format($closing_balance, 2, '.', ','));
+				
+			$s_op_balance=$s_op_balance+$op_balance;
+			$s_purchase=$s_purchase+$purchase;
+			$s_other=$s_other+$other;
+			$s_total_cost=$s_total_cost+$total_cost;
+			$s_book_value=$s_book_value+$book_value;
+			$s_proceeds_dispose=$s_proceeds_dispose+$proceeds_dispose;
+			$s_depreciation = $s_depreciation+$depreciation;
+			$s_closing_balance=$s_closing_balance+$closing_balance;
+		
+			
+			$g_op_balance=$g_op_balance+$op_balance;
+			$g_purchase=$g_purchase+$purchase;
+			$g_other=$g_other+$other;
+			$g_total_cost=$g_total_cost+$total_cost;
+			$g_book_value=$g_book_value+$book_value;
+			$g_proceeds_dispose=$g_proceeds_dispose+$proceeds_dispose;
+			$g_depreciation = $g_depreciation+$depreciation;
+			$g_closing_balance=$g_closing_balance+$closing_balance;
+			
+			 
+	}
+	  if($totalflag==true)
+				 {
+	  
+				$row = $row +1;
+				$col =0;
+				$worksheet->write($row, $col,"Grand Total");
+				$worksheet->write($row, $col+1,number_format($g_op_balance, 2, '.', ','));
+				$worksheet->write($row, $col+2,number_format($g_purchase, 2, '.', ','));
+				$worksheet->write($row, $col+3,number_format($g_other, 2, '.', ','),$format1);
+				$worksheet->write($row, $col+4,number_format($g_total_cost, 2, '.', ','));
+				$worksheet->write($row, $col+5, number_format($g_book_value, 2, '.', ','),$format1);
+				$worksheet->write($row, $col+6,number_format($g_proceeds_dispose, 2, '.', ','));
+				$worksheet->write($row, $col+7,number_format($g_depreciation, 2, '.', ','));
+				$worksheet->write($row, $col+8,number_format($g_closing_balance, 2, '.', ','));
+					
+					
+                }
+      /*****************************************************************/
+
+			# The general syntax is write($row, $column, $token). Note that row and
+			# column are zero indexed
+			#
+			# Write some text
+
+			$workbook->close();
+			header("Content-type: application/octet-stream");
+			header("Content-Type: application/x-msexcel; name=\"showinexcell.xls\"");
+			header("Content-Disposition: inline; filename=\"showinexcell.xls\"");
+			header("Content-Transfer-Encoding: binary");
+			$fh=fopen($fname, "rb");
+			fpassthru($fh);
+			unlink($fname);
+        break;
+
+
+
+	case "report_fixed_asset_schedule_dispose_summary_editor":
+	   
+
+		include("report_fixed_asset_schedule_dispose_summary_editor.php");
+		break;
+			
+		
+
+	default :
+		include("report_fixed_asset_schedule_dispose_summary_editor.php");
+
+		break;
+
+                    }
+
+                    ?>
