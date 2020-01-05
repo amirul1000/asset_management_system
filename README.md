@@ -5,6 +5,8 @@ Asset Management System in PHP MySQL | Accounting & Asset Management Software wi
 
 IT Asset Management Software consists of a set of business processes that manages the overall life cycle of assets strategic by joining the contractual, financial, inventory, and risk management responsibilities in a single Asset Management System. It also involves tactical and decision making for the IT environment.
 
+Fix your database connection : common/config.php
+
 
 Youtube Tutorial : https://youtu.be/WJyY0lfjFHI
 
