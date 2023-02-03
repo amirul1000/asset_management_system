@@ -8,9 +8,8 @@ IT Asset Management Software consists of a set of business processes that manage
 Fix your database connection in : common/config.php
 
 
-Youtube Tutorial : https://youtu.be/WJyY0lfjFHI
+Youtube Tutorial : https://youtu.be/qUOlgoZaRYM
 
-Youtube Channel : https://www.youtube.com/channel/UC2Q4oWfoMQzi6AES8Vb2vQw?view_as=subscriber
 
 Donate to Paypal : patabuz@gmail.com
 
